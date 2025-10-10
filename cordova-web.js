@@ -5,6 +5,12 @@ function fireDeviceReady () {
     console.debug('Cordova mock: deviceready event fired')
 }
 
+function fireBackButton () {
+    const event = new Event('backbutton')
+    document.dispatchEvent(event)
+    console.debug('Cordova mock: backbutton event fired')
+}
+
 function fireEvent (eventName, eventData, success, error, timeout = 1000) {
     sendPostMessage(eventName, eventData, timeout).then(success).catch(error)
 }
@@ -13,29 +19,29 @@ async function sendPostMessage (eventName, eventData, timeout = 1000) {
     return new Promise((resolve, reject) => {
         // Generate unique event ID
         const eventId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-        
+
         // Create payload
         const payload = {
             eventId,
             eventName,
             eventData,
         }
-        
+
         // Set up timeout
         const timeoutId = setTimeout(() => {
             window.removeEventListener('message', messageHandler)
             reject(new Error(`PostMessage timeout after ${timeout}ms for event: ${eventName}`))
         }, timeout)
-        
+
         // Message handler for response
         const messageHandler = (event) => {
             const response = event.data
-            
+
             // Check if this is the response we're waiting for
             if (response && response.eventId === eventId) {
                 clearTimeout(timeoutId)
                 window.removeEventListener('message', messageHandler)
-                
+
                 if (response.error) {
                     reject(new Error(response.error))
                 } else {
@@ -43,10 +49,10 @@ async function sendPostMessage (eventName, eventData, timeout = 1000) {
                 }
             }
         }
-        
+
         // Listen for response
         window.addEventListener('message', messageHandler)
-        
+
         // Send message to parent window
         if (window.parent && window.parent !== window) {
             window.parent.postMessage(payload, '*')
@@ -57,6 +63,13 @@ async function sendPostMessage (eventName, eventData, timeout = 1000) {
         }
     })
 }
+
+window.addEventListener('message', (evt) => {
+    const data = evt.data
+    if (data && typeof data === 'object' && Object.hasOwn(data, 'eventName') && data.eventName === 'backbutton') {
+        fireBackButton()
+    }
+})
 
 window.cordova = {
     platformId: 'web',
@@ -78,17 +91,17 @@ window.cordova = {
                 success(value)
             },
             history: {
-                pushState (state, title) {
-                    sendPostMessage('pushHistoryState', { state, title })
+                pushState (state, title, success, error) {
+                    fireEvent('pushHistoryState', { state, title }, success, error)
                 },
-                replaceState (state, title) {
-                    sendPostMessage('replaceHistoryState', { state, title })
+                replaceState (state, title, success, error) {
+                    fireEvent('replaceHistoryState', { state, title }, success, error)
                 },
-                back () {
-                    sendPostMessage('popHistoryState', { amount: -1 })
+                back (success, error) {
+                    fireEvent('traverseHistory', { amount: -1 }, success, error)
                 },
-                go (amount) {
-                    sendPostMessage('popHistoryState', { amount })
+                go (amount, success, error) {
+                    fireEvent('traverseHistory', { amount }, success, error)
                 },
             },
         },
