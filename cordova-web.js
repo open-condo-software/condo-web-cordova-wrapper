@@ -78,10 +78,18 @@ window.cordova = {
                 success(value)
             },
             history: {
-                pushState (state, title) {},
-                replaceState (state, title) {},
-                back () {},
-                go (amount) {},
+                pushState (state, title) {
+                    sendPostMessage('pushHistoryState', { state, title })
+                },
+                replaceState (state, title) {
+                    sendPostMessage('replaceHistoryState', { state, title })
+                },
+                back () {
+                    sendPostMessage('popHistoryState', { amount: -1 })
+                },
+                go (amount) {
+                    sendPostMessage('popHistoryState', { amount })
+                },
             },
         },
     },
