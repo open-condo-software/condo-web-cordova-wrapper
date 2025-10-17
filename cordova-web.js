@@ -1,7 +1,11 @@
+// Track if deviceready has been fired
+let deviceReadyFired = false
+
 // Function to fire the deviceready event
 function fireDeviceReady () {
     const event = new Event('deviceready')
     document.dispatchEvent(event)
+    deviceReadyFired = true
     console.debug('Cordova mock: deviceready event fired')
 }
 
@@ -62,6 +66,25 @@ async function sendPostMessage (eventName, eventData, timeout = 1000) {
             reject(new Error('No parent window available'))
         }
     })
+}
+
+// Store original addEventListener to intercept deviceready listeners
+const originalAddEventListener = document.addEventListener.bind(document)
+
+// Override document.addEventListener to handle late deviceready listeners
+document.addEventListener = function(type, listener, options) {
+    // Call the original addEventListener first
+    originalAddEventListener(type, listener, options)
+    
+    // If someone is adding a deviceready listener after the event has fired, trigger it immediately
+    if (type === 'deviceready' && deviceReadyFired && typeof listener === 'function') {
+        console.debug('Cordova mock: Immediately firing deviceready for late listener')
+        // Use setTimeout to make it asynchronous like the real event
+        setTimeout(() => {
+            const event = new Event('deviceready')
+            listener(event)
+        }, 0)
+    }
 }
 
 window.addEventListener('message', (evt) => {
