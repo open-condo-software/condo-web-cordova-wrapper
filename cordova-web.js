@@ -59,6 +59,7 @@ async function sendPostMessage (eventName, eventData, timeout = 1000) {
 
         // Send message to parent window
         if (window.parent && window.parent !== window) {
+            console.log('Sending PM to parent window', payload, window.parent)
             window.parent.postMessage(payload, '*')
         } else {
             clearTimeout(timeoutId)
