@@ -15,51 +15,50 @@ function fireBackButton () {
     console.debug('Cordova mock: backbutton event fired')
 }
 
-function fireEvent (eventName, eventData, success, error, timeout = 1000) {
-    sendPostMessage(eventName, eventData, timeout).then(success).catch(error)
+function wrapPromiseWithCallbacks(promise, success, error) {
+    promise.then(success).catch(error)
 }
 
-async function sendPostMessage (eventName, eventData, timeout = 1000) {
+async function sendCordovaMessage(type, handler, data, timeout = 1_000) {
     return new Promise((resolve, reject) => {
-        // Generate unique event ID
-        const eventId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+        const requestId = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
 
-        // Create payload
         const payload = {
-            eventId,
-            eventName,
-            eventData,
+            handler,
+            params: {
+                ...data,
+                requestId,
+            },
+            type,
+            version: '0.0.0-cordova-web-wrapper',
         }
 
-        // Set up timeout
         const timeoutId = setTimeout(() => {
             window.removeEventListener('message', messageHandler)
-            reject(new Error(`PostMessage timeout after ${timeout}ms for event: ${eventName}`))
+            reject(new Error(`PostMessage timeout after ${timeout}ms for event: ${handler}`))
         }, timeout)
 
-        // Message handler for response
         const messageHandler = (event) => {
             const response = event.data
 
             // Check if this is the response we're waiting for
-            if (response && response.eventId === eventId) {
+            if (response && response.data && response.data.requestId === requestId) {
                 clearTimeout(timeoutId)
                 window.removeEventListener('message', messageHandler)
 
-                if (response.error) {
-                    reject(new Error(response.error))
+                if (response.data.errorMessage) {
+                    reject(response.data)
                 } else {
-                    resolve(response.result)
+                    resolve(response.data)
                 }
             }
         }
 
-        // Listen for response
         window.addEventListener('message', messageHandler)
 
         // Send message to parent window
         if (window.parent && window.parent !== window) {
-            console.log('Sending PM to parent window', payload, window.parent)
+            console.log('Sending PM to parent window', payload)
             window.parent.postMessage(payload, '*')
         } else {
             clearTimeout(timeoutId)
@@ -100,13 +99,23 @@ window.cordova = {
     plugins: {
         condo: {
             requestServerAuthorizationByUrl (url, _options, success, error) {
-                fireEvent('requestServerAuthorizationByUrl', { url }, success, error, 10_000)
+                wrapPromiseWithCallbacks(
+                    sendCordovaMessage('condo-bridge', 'CondoWebAppRequestAuth', { url }, 10_000),
+                    success, error
+                )
             },
             getCurrentResident (success, error) {
-                fireEvent('getCurrentResident', {}, success, error, 5_000)
+                wrapPromiseWithCallbacks(
+                    sendCordovaMessage('condo-cordova-legacy', 'CondoWebAppGetCurrentResident', {}, 10_000),
+                    success, error
+                )
             },
             closeApplication (success, error) {
-                fireEvent('closeApplication', {}, success, error)
+                success(true)
+                // wrapPromiseWithCallbacks(
+                //     sendCordovaMessage('condo-cordova', 'CondoWebAppCloseApplication', {}),
+                //     success, error
+                // )
             },
             getLaunchContext (success, _error) {
                 success(null)
@@ -116,16 +125,38 @@ window.cordova = {
             },
             history: {
                 pushState (state, title, success, error) {
-                    fireEvent('pushHistoryState', { state, title }, success, error)
+                    wrapPromiseWithCallbacks(
+                        sendCordovaMessage('condo-cordova', 'CondoWebAppPushHistoryState', {
+                            state,
+                            title,
+                        }),
+                        success, error
+                    )
                 },
                 replaceState (state, title, success, error) {
-                    fireEvent('replaceHistoryState', { state, title }, success, error)
+                    wrapPromiseWithCallbacks(
+                        sendCordovaMessage('condo-cordova', 'CondoWebAppReplaceHistoryState', {
+                            state,
+                            title,
+                        }),
+                        success, error
+                    )
                 },
                 back (success, error) {
-                    fireEvent('traverseHistory', { amount: -1 }, success, error)
+                    wrapPromiseWithCallbacks(
+                        sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
+                            amount: 1,
+                        }),
+                        success, error
+                    )
                 },
                 go (amount, success, error) {
-                    fireEvent('traverseHistory', { amount }, success, error)
+                    wrapPromiseWithCallbacks(
+                        sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
+                            amount: -amount,
+                        }),
+                        success, error
+                    )
                 },
             },
         },
