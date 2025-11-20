@@ -89,7 +89,7 @@ document.addEventListener = function(type, listener, options) {
 
 window.addEventListener('message', (evt) => {
     const data = evt.data
-    if (data && typeof data === 'object' && Object.hasOwn(data, 'eventName') && data.eventName === 'backbutton') {
+    if (data && typeof data === 'object' && Object.hasOwn(data, 'type') && data.type === 'CondoWebAppBackButtonEvent') {
         fireBackButton()
     }
 })
