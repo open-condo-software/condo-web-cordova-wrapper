@@ -100,13 +100,15 @@ window.cordova = {
         condo: {
             requestServerAuthorizationByUrl (url, _options, success, error) {
                 wrapPromiseWithCallbacks(
-                    sendCordovaMessage('condo-bridge', 'CondoWebAppRequestAuth', { url }, 10_000),
+                    sendCordovaMessage('condo-bridge', 'CondoWebAppRequestAuth', { url }, 10_000)
+                        .then(data => data?.response),
                     success, error
                 )
             },
             getCurrentResident (success, error) {
                 wrapPromiseWithCallbacks(
-                    sendCordovaMessage('condo-cordova-legacy', 'CondoWebAppGetCurrentResident', {}, 10_000),
+                    sendCordovaMessage('condo-cordova-legacy', 'CondoWebAppGetCurrentResident', {}, 10_000)
+                        .then(data => data?.resident),
                     success, error
                 )
             },
