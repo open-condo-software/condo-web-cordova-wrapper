@@ -165,14 +165,52 @@ window.cordova = {
     },
 }
 
+
+// Set up ResizeObserver to monitor document.body height changes
+function setupResizeObserver() {
+    const observer = new ResizeObserver((entries) => {
+        if (entries && entries.length) {
+            sendCordovaMessage('condo-bridge', 'CondoWebAppResizeWindow', { height: entries[0].target.clientHeight })
+                .catch(error => {
+                    console.debug('Failed to send resize message:', error)
+                })
+        }
+    })
+    observer.observe(document.body)
+}
+
+// Initialize ResizeObserver when DOM is ready
+function initializeResizeObserver() {
+    if (document.body) {
+        document.body.style.height = 'auto'
+        setupResizeObserver()
+    } else {
+        // If body is not ready yet, wait for it
+        const bodyObserver = new MutationObserver(() => {
+            if (document.body) {
+                bodyObserver.disconnect()
+                document.body.style.height = 'auto'
+                setupResizeObserver()
+            }
+        })
+        bodyObserver.observe(document.documentElement, { childList: true })
+    }
+}
+
 // Wait for all scripts to load, then fire deviceready event
 if (document.readyState === 'loading') {
     // If the document is still loading, wait for DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
         // Use setTimeout to ensure all deferred scripts have executed
-        setTimeout(fireDeviceReady, 0)
+        setTimeout(() => {
+            fireDeviceReady()
+            initializeResizeObserver()
+        }, 0)
     })
 } else {
     // If document is already loaded, fire immediately
-    setTimeout(fireDeviceReady, 0)
+    setTimeout(() => {
+        fireDeviceReady()
+        initializeResizeObserver()
+    }, 0)
 }
