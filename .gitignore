@@ -80,7 +80,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -118,8 +117,3 @@ Thumbs.db
 platforms/
 plugins/
 www/
-
-# Build outputs
-build/
-dist/
-out/

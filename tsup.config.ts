@@ -6,7 +6,7 @@ export default defineConfig({
 	outDir: 'dist',
 	clean: true,
 	minify: true,
-	sourcemap: true,
+	sourcemap: false,
 	target: 'es2020',
 	globalName: 'CordovaWeb',
 	platform: 'browser',
