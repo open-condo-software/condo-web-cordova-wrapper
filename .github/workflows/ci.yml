@@ -1,0 +1,44 @@
+name: Cordova-Web CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Lint and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Build code
+        run: npm run build
+
+      - name: Check if dist is in sync with src
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "❌ dist/ directory is out of sync with source code"
+            echo "The following files have changes:"
+            git status --porcelain dist/
+            echo ""
+            echo "Please run 'npm run build' locally and commit the changes"
+            exit 1
+          else
+            echo "✅ dist/ directory is in sync with source code"
+          fi

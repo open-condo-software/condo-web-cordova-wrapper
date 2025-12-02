@@ -3,8 +3,6 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
 
 # Runtime data
 pids
@@ -80,7 +78,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -118,8 +115,3 @@ Thumbs.db
 platforms/
 plugins/
 www/
-
-# Build outputs
-build/
-dist/
-out/

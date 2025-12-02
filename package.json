@@ -1,0 +1,43 @@
+{
+  "name": "condo-web-cordova-wrapper",
+  "version": "0.0.0-development",
+  "description": "\"Mock of cordova to support built-for-native B2C miniapps in web environment\"",
+  "main": "cordova-web.js",
+  "scripts": {
+    "test": "echo \"No tests added yet\"",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "prettier --check \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts}\"",
+    "lint:fix": "prettier --write \"**/*.{js,ts,jsx,tsx,cjs,cts,mjs,mts}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-condo-software/condo-web-cordova-wrapper.git"
+  },
+  "keywords": [
+    "condo",
+    "open-condo",
+    "web",
+    "miniapps",
+    "cordova"
+  ],
+  "author": {
+    "name": "Matthew Savelev",
+    "email": "matthew@doma.ai",
+    "url": "https://github.com/SavelevMatthew"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/open-condo-software/condo-web-cordova-wrapper/issues"
+  },
+  "homepage": "https://github.com/open-condo-software/condo-web-cordova-wrapper#readme",
+  "devDependencies": {
+    "@open-condo/tsconfig": "^1.0.4",
+    "prettier": "3.7.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
