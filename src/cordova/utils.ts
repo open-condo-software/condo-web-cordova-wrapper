@@ -24,7 +24,7 @@ export function sendCordovaMessage(
 				...eventData,
 				requestId,
 			},
-			eventType,
+			type: eventType,
 			version: '1.0.0-cordova-web-wrapper',
 		}
 
