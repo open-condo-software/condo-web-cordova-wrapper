@@ -3,13 +3,19 @@ import { CondoWebPlugin } from './cordova/plugins'
 import { addEventListeners, fireEvent } from './events'
 import { initializeResizeObserver } from './resizer'
 
+declare global {
+	interface Window {
+		cordova: CordovaWeb
+	}
+}
+
 async function initApplicationMocks() {
 	initializeResizeObserver()
 	addEventListeners()
 
 	const cordova = new CordovaWeb([new CondoWebPlugin()])
 	await cordova._init()
-	;(window as any).cordova = cordova
+	window.cordova = cordova
 
 	fireEvent('deviceready', {}, true)
 }
