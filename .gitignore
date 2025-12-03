@@ -113,5 +113,4 @@ Thumbs.db
 
 # Cordova specific
 platforms/
-plugins/
 www/

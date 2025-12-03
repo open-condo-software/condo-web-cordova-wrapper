@@ -1,0 +1,1 @@
+export { CondoWebPlugin } from './condo'
