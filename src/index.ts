@@ -9,16 +9,13 @@ declare global {
 	}
 }
 
-async function initApplicationMocks() {
+function initApplicationMocks() {
 	initializeResizeObserver()
 	addEventListeners()
-
-	const cordova = new CordovaWeb([new CondoWebPlugin()])
-	await cordova._init()
-	window.cordova = cordova
-
-	fireEvent('deviceready', {}, true)
+	window.cordova._init().then(() => fireEvent('deviceready', {}, true))
 }
+
+window.cordova = new CordovaWeb([new CondoWebPlugin()])
 
 // Wait for all scripts to load, then fire deviceready event
 if (document.readyState === 'loading') {
