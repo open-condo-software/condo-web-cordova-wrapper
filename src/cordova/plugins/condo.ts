@@ -21,7 +21,9 @@ export class CondoWebPlugin implements CordovaWebPlugin {
 	// TODO: deprecate this method, since each app must request its own fields via API after auth
 	getCurrentResident(success: SuccessCallback, error: ErrorCallback) {
 		wrapPromiseWithCallbacks(
-			sendCordovaMessage('condo-cordova-legacy', 'CondoWebAppGetCurrentResident', {}, 10_000),
+			sendCordovaMessage('condo-cordova-legacy', 'CondoWebAppGetCurrentResident', {}, 10_000).then(
+				(data: any) => data?.resident,
+			),
 			success,
 			error,
 		)
@@ -34,7 +36,7 @@ export class CondoWebPlugin implements CordovaWebPlugin {
 
 	getLaunchContext(success: SuccessCallback, error: ErrorCallback) {
 		wrapPromiseWithCallbacks(
-			bridge.send('CondoWebAppGetFragment').then((data) => data.fragment ?? null),
+			bridge.send('CondoWebAppGetFragment').then((data) => data.fragment || null),
 			success,
 			error,
 		)
