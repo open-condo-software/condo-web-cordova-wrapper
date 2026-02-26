@@ -36,11 +36,12 @@
   "homepage": "https://github.com/open-condo-software/condo-web-cordova-wrapper#readme",
   "devDependencies": {
     "@open-condo/tsconfig": "^1.0.4",
+    "@types/node": "^25.3.1",
     "prettier": "3.7.3",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@open-condo/bridge": "^2.3.0"
+    "@open-condo/bridge": "^2.5.0"
   }
 }

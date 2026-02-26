@@ -2,8 +2,47 @@ import bridge from '@open-condo/bridge'
 import { wrapPromiseWithCallbacks, sendCordovaMessage } from '../utils'
 import type { CordovaWebPlugin, SuccessCallback, ErrorCallback } from '../types'
 
+class CondoHostApplication {
+	private _deviceID: string = ''
+	private _locale: string = 'ru'
+
+	async _init() {
+		bridge.send('CondoWebAppGetLaunchParams').then((data) => {
+			if (data.condoDeviceId) this._deviceID = data.condoDeviceId
+			if (data.condoLocale) this._locale = data.condoLocale
+		})
+	}
+
+	baseURL() {
+		return process.env.CONDO_BASE_URL || 'https://condo.example.com'
+	}
+
+	installationID() {
+		return this._deviceID
+	}
+
+	deviceID() {
+		return this._deviceID
+	}
+
+	locale() {
+		return this._locale
+	}
+
+	isDemoEnvironment() {
+		const u = new URL(this.baseURL())
+		return !u.hostname.startsWith('v1.')
+	}
+}
+
 export class CondoWebPlugin implements CordovaWebPlugin {
 	name = 'condo'
+
+	hostApplication = new CondoHostApplication()
+
+	async _init() {
+		await this.hostApplication._init()
+	}
 
 	requestServerAuthorizationByUrl(
 		url: string,
