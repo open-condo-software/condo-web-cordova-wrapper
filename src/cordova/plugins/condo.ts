@@ -85,45 +85,18 @@ export class CondoWebPlugin implements CordovaWebPlugin {
 		success(value)
 	}
 
-	// TODO: migrate to bridge and add docs, since it will be stable API
 	history = {
 		pushState(state: unknown, title: string, success: SuccessCallback, error: ErrorCallback) {
-			wrapPromiseWithCallbacks(
-				sendCordovaMessage('condo-cordova', 'CondoWebAppPushHistoryState', {
-					state,
-					title,
-				}),
-				success,
-				error,
-			)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPushHistoryState', { state, title }), success, error)
 		},
 		replaceState(state: unknown, title: string, success: SuccessCallback, error: ErrorCallback) {
-			wrapPromiseWithCallbacks(
-				sendCordovaMessage('condo-cordova', 'CondoWebAppReplaceHistoryState', {
-					state,
-					title,
-				}),
-				success,
-				error,
-			)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppReplaceHistoryState', { state, title }), success, error)
 		},
 		back(success: SuccessCallback, error: ErrorCallback) {
-			wrapPromiseWithCallbacks(
-				sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
-					amount: 1,
-				}),
-				success,
-				error,
-			)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPopHistoryState', { amount: 1 }), success, error)
 		},
 		go(amount: number, success: SuccessCallback, error: ErrorCallback) {
-			wrapPromiseWithCallbacks(
-				sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
-					amount: -amount,
-				}),
-				success,
-				error,
-			)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPopHistoryState', { amount: -amount }), success, error)
 		},
 	}
 }
