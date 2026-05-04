@@ -1,3 +1,5 @@
+import bridge from '@open-condo/bridge'
+
 const _firedEvents = new Set()
 
 export function fireEvent(eventName: string, eventData?: Record<string, unknown>, markAsFired?: boolean) {
@@ -10,16 +12,12 @@ export function fireEvent(eventName: string, eventData?: Record<string, unknown>
 }
 
 export function addEventListeners() {
-	// TODO: replace with bridge.subscribe once history API migrated to bridge
-	window.addEventListener('message', (evt) => {
-		const data = evt.data
-		if (
-			data &&
-			typeof data === 'object' &&
-			Object.hasOwn(data, 'type') &&
-			data.type === 'CondoWebAppBackButtonEvent'
-		) {
+	bridge.subscribe((event) => {
+		if (event.type === 'CondoWebAppBackButtonEvent') {
 			fireEvent('backbutton')
+		}
+		if (event.type === 'CondoWebAppHistoryPopStateEvent') {
+			fireEvent('condoPopstate', { state: event?.data?.state, title: event?.data?.title })
 		}
 	})
 
