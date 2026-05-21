@@ -87,39 +87,16 @@ export class CondoWebPlugin implements CordovaWebPlugin {
 
 	history = {
 		pushState: (state: unknown, title: string, success: SuccessCallback, error: ErrorCallback) => {
-			const promise = this.hostApplication.isDemoEnvironment()
-				? bridge.send('CondoWebAppPushHistoryState', { state, title })
-				: sendCordovaMessage('condo-cordova', 'CondoWebAppPushHistoryState', {
-						state,
-						title,
-					})
-
-			wrapPromiseWithCallbacks(promise, success, error)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPushHistoryState', { state, title }), success, error)
 		},
 		replaceState: (state: unknown, title: string, success: SuccessCallback, error: ErrorCallback) => {
-			const promise = this.hostApplication.isDemoEnvironment()
-				? bridge.send('CondoWebAppReplaceHistoryState', { state, title })
-				: sendCordovaMessage('condo-cordova', 'CondoWebAppReplaceHistoryState', {
-						state,
-						title,
-					})
-			wrapPromiseWithCallbacks(promise, success, error)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppReplaceHistoryState', { state, title }), success, error)
 		},
 		back: (success: SuccessCallback, error: ErrorCallback) => {
-			const promise = this.hostApplication.isDemoEnvironment()
-				? bridge.send('CondoWebAppPopHistoryState', { amount: 1 })
-				: sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
-						amount: 1,
-					})
-			wrapPromiseWithCallbacks(promise, success, error)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPopHistoryState', { amount: 1 }), success, error)
 		},
 		go: (amount: number, success: SuccessCallback, error: ErrorCallback) => {
-			const promise = this.hostApplication.isDemoEnvironment()
-				? bridge.send('CondoWebAppPopHistoryState', { amount: -amount })
-				: sendCordovaMessage('condo-cordova', 'CondoWebAppPopHistoryState', {
-						amount: -amount,
-					})
-			wrapPromiseWithCallbacks(promise, success, error)
+			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPopHistoryState', { amount: -amount }), success, error)
 		},
 	}
 }
