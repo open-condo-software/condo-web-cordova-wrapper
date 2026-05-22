@@ -42,6 +42,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@open-condo/bridge": "^2.5.0"
+    "@open-condo/bridge": "^2.7.0"
   }
 }

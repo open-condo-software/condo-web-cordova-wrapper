@@ -8,6 +8,16 @@ export function wrapPromiseWithCallbacks(
 	promise.then(success).catch(error)
 }
 
+export function callbacksToPromise<TArgs extends Array<unknown>, TResult>(
+	fn: (...args: [...TArgs, SuccessCallback, ErrorCallback]) => void,
+): (...args: TArgs) => Promise<TResult> {
+	return async function promisifiedMethod(...args: TArgs) {
+		return new Promise<TResult>((resolve, reject) => {
+			fn(...args, resolve as SuccessCallback, reject as ErrorCallback)
+		})
+	}
+}
+
 // TODO: think about extending condo-bridge with custom events protocol
 export function sendCordovaMessage(
 	eventType: string,
