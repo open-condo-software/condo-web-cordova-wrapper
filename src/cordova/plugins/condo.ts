@@ -1,5 +1,5 @@
 import bridge from '@open-condo/bridge'
-import { wrapPromiseWithCallbacks, sendCordovaMessage } from '../utils'
+import { wrapPromiseWithCallbacks, sendCordovaMessage, callbacksToPromise } from '../utils'
 import type { CordovaWebPlugin, SuccessCallback, ErrorCallback } from '../types'
 
 class CondoHostApplication {
@@ -98,5 +98,28 @@ export class CondoWebPlugin implements CordovaWebPlugin {
 		go: (amount: number, success: SuccessCallback, error: ErrorCallback) => {
 			wrapPromiseWithCallbacks(bridge.send('CondoWebAppPopHistoryState', { amount: -amount }), success, error)
 		},
+	}
+
+	startInvoicePayment(invoiceId: string, success: SuccessCallback, error: ErrorCallback) {
+		wrapPromiseWithCallbacks(
+			bridge
+				.send('CondoWebAppRequestPayment', { invoiceIds: [invoiceId] })
+				.then((data) => ({
+					invoiceId,
+					multiPaymentId: data.multiPaymentId,
+					status: data.success ? 'payment_success' : 'payment_failed',
+				}))
+				.catch(() => ({
+					invoiceId,
+					multiPaymentId: null,
+					status: 'payment_failed',
+				})),
+			success,
+			error,
+		)
+	}
+
+	withPromises = {
+		startInvoicePayment: callbacksToPromise(this.startInvoicePayment),
 	}
 }
